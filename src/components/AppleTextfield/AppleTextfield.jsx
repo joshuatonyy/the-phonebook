@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./AppleTextfield.css";
 
 function AppleTextfield({ 
@@ -8,8 +8,23 @@ function AppleTextfield({
   value, 
   onChange, 
   required = false, 
-  className = "" 
+  className = "", 
+  initialValue = "" 
 }) {
+  const [inputValue, setInputValue] = useState(initialValue);
+
+  useEffect(() => {
+    if (value !== undefined) {
+      setInputValue(value);
+    }
+  }, [value]);
+
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    if (onChange) onChange(e);
+  };
+
   return (
     <div className={`entry ${className}`}>
       <input
@@ -17,18 +32,17 @@ function AppleTextfield({
         type={type}
         required={required}
         className="input"
-        value={value}
-        onChange={onChange}
+        value={inputValue}
+        onChange={handleChange}
       />
       <label
         htmlFor={id}
-        className={`entry-label ${value ? "active" : ""}`}
+        className={`entry-label ${inputValue ? "active" : ""}`}
       >
         {label}
       </label>
     </div>
   );
 }
-
 
 export default AppleTextfield;

@@ -1,10 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ContactForm.css";
 import AppleTextfield from "../../../components/AppleTextfield/AppleTextfield";
 
-export const ContactForm = ({ isEdit, onClose, onSubmit }) => {
+export const ContactForm = ({ isNew, onClose, onSubmit, selectedContact }) => {
   const [nameValue, setNameValue] = useState("");
   const [phoneValue, setPhoneValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // useEffect(() => {
+  //   setNameValue(selectedContact.contact_name || "");
+  //   setPhoneValue(selectedContact.contact_phone_number || "");
+  // }, [selectedContact]);
+
+  const handleSubmit = () => {
+    try {
+      if (!nameValue.trim() || !phoneValue.trim()) {
+        setErrorMessage("Both fields are required.");
+        return;
+      }
+      if (!/^\d{10,12}$/.test(phoneValue)) {
+        setErrorMessage("Phone number must be number only 10 - 12 digits.");
+        return;
+      }
+
+      onSubmit(
+        { contact_name: nameValue, contact_phone_number: phoneValue },
+      );
+
+      setNameValue("");
+      setPhoneValue("");
+      setErrorMessage("");
+
+      onClose();
+    } catch (err) {
+      setErrorMessage(err.response?.data?.error || "Error creating contact");
+    }
+  };
 
   return (
     <div className="contactform__overlay">
@@ -20,12 +51,16 @@ export const ContactForm = ({ isEdit, onClose, onSubmit }) => {
         </div>
 
         <div className="contactform__entries">
+          {/* Error Message */}
+          {errorMessage && <p className="contactform__error">{errorMessage}</p>}
+
           {/* NAME */}
           <AppleTextfield
             id="contact-name"
             label="Name"
             value={nameValue}
             onChange={(e) => setNameValue(e.target.value)}
+            // initialValue={selectedContact.name}
             required
           />
           {/* PHONE NUMBER */}
@@ -35,12 +70,13 @@ export const ContactForm = ({ isEdit, onClose, onSubmit }) => {
             type="tel"
             value={phoneValue}
             onChange={(e) => setPhoneValue(e.target.value)}
+            // initialValue={selectedContact.phone_number}
             required
           />
         </div>
 
         <div className="contactform__submit-container">
-          <div className="contactform__submit-button" onClick={onSubmit}>
+          <div className="contactform__submit-button" onClick={handleSubmit}>
             Submit
           </div>
         </div>

@@ -1,10 +1,19 @@
 import React from "react";
 import './AppleSearchBar.css'
 
-export const AppleSearchBar = () => {
+export const AppleSearchBar = ({ onSearch }) => {
+  const handleInputChange = (event) => {
+    onSearch(event.target.value); // Pass the input value to the parent
+  };
+
   return (
     <div className="search-bar">
-      <input type="text" placeholder="Search" className="search-bar__input" />
+      <input
+        type="text"
+        placeholder="Search contact name..."
+        className="search-bar__input"
+        onChange={handleInputChange} // Trigger the search handler on input change
+      />
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="search-bar__icon"

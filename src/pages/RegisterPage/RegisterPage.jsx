@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
+import { register } from "../../api";
 import "./RegisterPage.css";
 import AppleTextfield from "../../components/AppleTextfield/AppleTextfield";
 
@@ -7,6 +8,29 @@ export const RegisterPage = () => {
   const [nameValue, setNameValue] = useState("");
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleRegister = async () => {
+    try {
+      setError("");
+      setSuccess(false);
+
+      if (!nameValue || !emailValue || !passwordValue) {
+        setError("All fields are required.");
+        return;
+      }
+
+      const response = await register({
+        name: nameValue,
+        email: emailValue,
+        password: passwordValue,
+      });
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.error || "Registration failed.");
+    }
+  };
 
   return (
     <div className="registerpage__parent-container">
@@ -46,9 +70,16 @@ export const RegisterPage = () => {
           />
         </div>
 
+        {error && <div className="error-message">{error}</div>}
+        {success && (
+          <div className="success-message">
+            Registration successful! You can now <Link to="/login">sign in</Link>.
+          </div>
+        )}
+
         {/*Register and Login Button*/}
         <div className="submit-container">
-          <div className="submit-register">Register</div>
+          <div className="submit-register" onClick={handleRegister}>Register</div>
         </div>
 
         {/*Register New Account Hyperlink*/}
